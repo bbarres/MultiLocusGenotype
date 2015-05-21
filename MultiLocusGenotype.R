@@ -40,7 +40,7 @@ model$clearStack()$addObservationStack(response=infections$number_MLG, covariate
 model$estimate()
 model$summary() # WAIC = 1458.94
 
-# Best fitting model (lowest WAIC)
+# Best fitting model with nbinomial likelihood (lowest WAIC)
 model$setCovariatesModel(~ 1 + PLM2_Sept2012 + AA_F2012, covariates=infections)
 model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
 model$estimate()
@@ -50,3 +50,10 @@ model$setCovariatesModel(~ 1 + AA_F2012, covariates=infections)
 model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
 model$estimate()
 model$summary() # WAIC = 1457.46
+
+# There is no overdispersion, so poisson likelihood is enough
+model$setLikelihood("poisson")
+model$setCovariatesModel(~ 1 + PLM2_Sept2012 + AA_F2012, covariates=infections)
+model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
+model$estimate()
+model$summary() # WAIC = 1424.59

@@ -11,7 +11,10 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+<<<<<<< HEAD
 .Rproj.user
 
 # Data files
 stat_patch2012corr.txt
+=======
+>>>>>>> c5f1967ddceb8bdce7163329a48a780cfd10898b
