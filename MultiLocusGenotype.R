@@ -1,18 +1,23 @@
 if (F) {
+  # Need to install SpaceTime package first
   library(devtools)
   install_github("statguy/SpaceTime")
 }
 library(SpaceTime)
 
 infections <- read.csv("stat_patch2012corr.txt", sep="\t", fileEncoding="ISO-8859-1")
+
+# Remove data with missing covariates data
 complete <- complete.cases(infections[,c("PLM2_Sept2012","AA_F2012","Distance_to_shore","PA_2011")])
 infections <- infections[complete,]
 
+# Construct estimation mesh
 mesh <- NonConvexHullMesh$new(knots=infections[,c("Longitude","Latitude")], knotsScale=1e5)
 mesh$construct(cutoff=1e3, maxEdge=c(2.2e3, 1e5), convex=0.1)
 mesh$getINLAMesh()$n
 mesh$plot()
 
+# Setup spatial model
 model <- ContinuousSpaceModel$new()
 model$setSpatialMesh(mesh)
 model$setSpatialPrior()
