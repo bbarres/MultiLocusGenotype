@@ -7,9 +7,11 @@ library(SpaceTime)
 
 infections <- read.csv("stat_patch2012corr.txt", sep="\t", fileEncoding="ISO-8859-1")
 
-# Remove data with missing covariates data
+# Remove missing data and scale covariates
 complete <- complete.cases(infections[,c("PLM2_Sept2012","AA_F2012","Distance_to_shore","PA_2011")])
 infections <- infections[complete,]
+infections[,c("PLM2_Sept2012","AA_F2012","Distance_to_shore","PA_2011")] <- scale(infections[,c("PLM2_Sept2012","AA_F2012","Distance_to_shore","PA_2011")])
+#infections$number_MLG <- infections$number_MLG - 1
 
 # Construct estimation mesh
 mesh <- NonConvexHullMesh$new(knots=infections[,c("Longitude","Latitude")], knotsScale=1e5)
@@ -50,6 +52,9 @@ model$setCovariatesModel(~ 1 + PLM2_Sept2012 + AA_F2012, covariates=infections)
 model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
 model$estimate()
 model$summary() # WAIC = 1455.63
+fittedResponse <- model$getFittedResponse()
+table(infections$number_MLG)
+table(round(fittedResponse$responseMean))
 
 model$setCovariatesModel(~ 1 + AA_F2012, covariates=infections)
 model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
@@ -62,3 +67,16 @@ model$setCovariatesModel(~ 1 + PLM2_Sept2012 + AA_F2012, covariates=infections)
 model$clearStack()$addObservationStack(response=infections$number_MLG, covariates=infections)
 model$estimate()
 model$summary() # WAIC = 1424.59
+
+fittedResponse <- model$getFittedResponse()
+table(infections$number_MLG)
+table(round(fittedResponse$responseMean))
+
+# Non-spatial models
+summary(inla(number_MLG ~ 1, data=infections, family="poisson", control.predictor=list(compute=TRUE), control.compute=list(waic=TRUE)))
+# WAIC = 1461.06
+fit <- inla(number_MLG ~ 1 + PLM2_Sept2012 + AA_F2012, data=infections, family="poisson", control.predictor=list(compute=TRUE), control.compute=list(waic=TRUE))
+summary(fit)
+# WAIC = 1425.23
+# The spatial model appears not to improve the fit much
+table(round(fit$summary.fitted.values$mean))
