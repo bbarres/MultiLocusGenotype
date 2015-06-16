@@ -2,6 +2,7 @@ if (F) {
   # Need to install SpaceTime package first
   library(devtools)
   install_github("statguy/SpaceTimeModels")
+  reload(inst("SpaceTimeModels"))
 }
 library(SpaceTimeModels)
 
@@ -15,8 +16,7 @@ coords <- sp::SpatialPoints(infections[,c("Longitude","Latitude")]);
 #infections$number_MLG <- infections$number_MLG - 1
 
 # Construct estimation mesh
-mesh <- SpaceTimeModels::NonConvexHullMesh$new(knots=coords, knotsScale=1e5)
-mesh$construct(cutoff=1e3, maxEdge=c(2.2e3, 1e5), convex=0.1)
+mesh <- SpaceTimeModels::NonConvexHullMesh$new(knots=coords, knotsScale=1e5, cutoff=1e3, maxEdge=c(2.2e3, 1e5), convex=0.1)
 mesh$getINLAMesh()$n
 mesh$plot()
 
